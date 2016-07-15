@@ -63,25 +63,65 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> mergeSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+        int size = list.size();
+        if (size < 2) {
+            return list;
+        }
+
+        List<T> first = mergeSort(new LinkedList<T>(list.subList(0, size/2)), comparator);
+        List<T> second = mergeSort(new LinkedList<T>(list.subList(size/2, size)), comparator);
+        
+        return merge(first, second, comparator);
 	}
 
-	/**
-	 * Sorts a list using a Comparator object.
-	 * 
-	 * @param list
-	 * @param comparator
-	 * @return
-	 */
-	public void heapSort(List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-	}
+    private List<T> merge(List<T> first, List<T> second, Comparator<T> comparator){
+        
+        List<T> merged = new LinkedList<T>();
+        int total = first.size() + second.size();
+        for (int i=0; i<total; i++) {
+            List<T> lg = pickLarger(first, second, comparator);
+            merged.add(lg.remove(0));
+        }
+        return merged;
 
-	
+    }
+    private List<T> pickLarger(List<T> first, List<T> second, Comparator<T> comparator) {
+        if (first.size() == 0) {
+            return second;
+        }
+        if (second.size() == 0) {
+            return first;
+        }
+        int res = comparator.compare(first.get(0), second.get(0));
+        if (res < 0) {
+            return first;
+        }
+        if (res > 0) {
+            return second;
+        }
+        return first;
+    }
+    
+    /**
+     * Sorts a list using a Comparator object.
+     *
+     * @param list
+     * @param comparator
+     * @return
+     */
+    public void heapSort(List<T> list, Comparator<T> comparator) {
+        PriorityQueue<T> heap = new PriorityQueue<T>(list.size(), comparator);
+        heap.addAll(list);
+        list.clear();
+        while (!heap.isEmpty()) {
+            list.add(heap.poll());
+        }
+    }
+
+
 	/**
 	 * Returns the largest `k` elements in `list` in ascending order.
-	 * 
+	 *
 	 * @param k
 	 * @param list
 	 * @param comparator
@@ -89,8 +129,24 @@ public class ListSorter<T> {
 	 * @return
 	 */
 	public List<T> topK(int k, List<T> list, Comparator<T> comparator) {
-        // FILL THIS IN!
-        return null;
+        
+        PriorityQueue<T> heap = new PriorityQueue<T>(list.size(), comparator);
+        for (T item: list) {
+            if (heap.size() < k) {
+                heap.offer(item);
+                continue;
+            }
+            int cmp = comparator.compare(item, heap.peek());
+            if (cmp > 0) {
+                heap.poll();
+                heap.offer(item);
+            }
+        }
+        List<T> result = new ArrayList<T>();
+        while (!heap.isEmpty()) {
+            result.add(heap.poll());
+        }
+        return result;
 	}
 
 	
